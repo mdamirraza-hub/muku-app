@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MUKU ULTRA AI - OS PHASE 28-29</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; user-select: none; }
+    body {
+      background-color: #040208;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.08) 0%, transparent 70%),
+        linear-gradient(rgba(138, 43, 226, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(138, 43, 226, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+      color: #b19cd9; width: 100vw; height: 100dvh; overflow: hidden; position: relative;
+    }
+    .top-header { position: absolute; top: 8px; left: 0; width: 100%; padding: 0 10px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 30; }
+    .top-left-badge { display: flex; align-items: center; gap: 6px; }
+    .badge-icon { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #b19cd9; background: radial-gradient(#8a2be2, #200030); box-shadow: 0 0 10px #8a2be2; display: flex; justify-content: center; align-items: center; font-weight: 900; color: #fff; font-size: 11px; flex-shrink: 0; }
+    .badge-text { display: flex; flex-direction: column; }
+    .brand-title { font-size: 11px; font-weight: 900; letter-spacing: 1.5px; color: #fff; text-shadow: 0 0 8px #8a2be2; white-space: nowrap; }
+    .brand-sub { font-size: 6.5px; letter-spacing: 1px; color: #d8bfd8; white-space: nowrap; }
+    .sci-fi-clock-box { display: flex; flex-direction: column; align-items: flex-end; background: rgba(15, 2, 25, 0.6); border: 1px solid rgba(138, 43, 226, 0.3); padding: 3px 8px; border-radius: 6px; backdrop-filter: blur(10px); box-shadow: 0 0 12px rgba(138, 43, 226, 0.2); }
+    .time-row { display: flex; align-items: baseline; gap: 3px; }
+    .hud-digital-time { font-size: 18px; font-weight: 900; color: #ffffff; letter-spacing: 1px; text-shadow: 0 0 8px #8a2be2; font-family: monospace; }
+    .hud-seconds { font-size: 10px; font-weight: 800; color: #00f0ff; text-shadow: 0 0 6px #00f0ff; font-family: monospace; }
+    .sub-date { font-size: 7px; font-weight: 800; color: #e6e6fa; letter-spacing: 1.5px; text-transform: uppercase; }
+    .top-launcher { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 20; background: rgba(15, 2, 25, 0.7); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(138, 43, 226, 0.3); backdrop-filter: blur(10px); max-width: 95vw; overflow-x: auto; }
+    .app-icon { font-size: 8px; font-weight: bold; color: #d8bfd8; text-transform: uppercase; padding: 2px 5px; border-radius: 4px; background: rgba(138, 43, 226, 0.15); border: 1px solid rgba(138, 43, 226, 0.3); white-space: nowrap; }
+    .sidebar-left { position: absolute; left: 8px; top: 90px; display: flex; flex-direction: column; gap: 5px; z-index: 20; }
+    .nav-btn { width: 78px; padding: 5px 6px; background: linear-gradient(90deg, rgba(138,43,226,0.2), rgba(20,0,30,0.6)); border-left: 3px solid #8a2be2; border-top: 1px solid rgba(138,43,226,0.2); border-bottom: 1px solid rgba(138,43,226,0.2); color: #e6e6fa; font-size: 7.5px; font-weight: 700; letter-spacing: 1px; clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); text-transform: uppercase; cursor: pointer; outline: none; transition: 0.2s; text-align: left; }
+    .nav-btn:active { transform: scale(0.95); border-left-color: #00f0ff; background: rgba(0, 240, 255, 0.2); }
+    .sidebar-right { position: absolute; right: 8px; top: 90px; width: 115px; z-index: 20; font-size: 8px; color: #e6e6fa; text-align: right; }
+    .widget-box { border-right: 2px solid #8a2be2; padding-right: 5px; margin-bottom: 8px; background: linear-gradient(-90deg, rgba(138, 43, 226, 0.1), transparent); }
+    .widget-title { font-size: 7px; color: #fff; font-weight: 800; letter-spacing: 1px; text-shadow: 0 0 5px #8a2be2; }
+    .widget-val { font-size: 9.5px; font-weight: 700; color: #b19cd9; }
+    .center-hud { position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); width: 250px; height: 250px; display: flex; justify-content: center; align-items: center; z-index: 10; }
+    .reactor-ring { position: absolute; border-radius: 50%; pointer-events: none; transition: 0.4s; }
+    .ring-outer-teeth { width: 240px; height: 240px; border: 2px dashed rgba(138, 43, 226, 0.4); animation: rotateCW 20s linear infinite; }
+    .ring-segmented { width: 210px; height: 210px; border: 3px solid transparent; border-top-color: #8a2be2; border-bottom-color: #8a2be2; box-shadow: 0 0 12px rgba(138, 43, 226, 0.5); animation: rotateCCW 12s linear infinite; }
+    .ring-tech-scale { width: 180px; height: 180px; border: 1.5px dotted rgba(216, 191, 216, 0.8); animation: rotateCW 8s linear infinite; }
+    .ring-inner-glow { width: 140px; height: 140px; border: 2px solid transparent; border-left-color: #4b0082; border-right-color: #d8bfd8; animation: rotateCCW 5s linear infinite; }
+    .core-orb { width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #b19cd9, #4b0082 60%, #150025 100%); border: 2px solid #e6e6fa; box-shadow: 0 0 20px #8a2be2, inset 0 0 12px #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; animation: pulseGlow 3s ease-in-out infinite alternate; }
+    .core-muku { font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 1px; text-shadow: 0 0 8px currentColor; }
+    .core-status { font-size: 6.5px; font-weight: 800; color: #e6e6fa; letter-spacing: 1px; text-align: center; max-width: 85px; }
+    .bottom-hud { position: absolute; bottom: 25px; width: 100%; padding: 0 12px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 20; }
+    .sys-meter { display: flex; flex-direction: column; gap: 2px; font-size: 7.5px; font-weight: 700; color: #d8bfd8; }
+    .meter-bar { width: 75px; height: 5px; background: rgba(138,43,226,0.15); border: 1px solid #8a2be2; border-radius: 3px; overflow: hidden; }
+    .meter-fill { height: 100%; width: 85%; background: #8a2be2; box-shadow: 0 0 6px #8a2be2; }
+    .mic-trigger { width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(20, 0, 30, 0.95) 80%); border: 2px solid #d8bfd8; cursor: pointer; box-shadow: 0 0 20px rgba(138, 43, 226, 0.7), inset 0 0 12px rgba(216, 191, 216, 0.4); display: flex; justify-content: center; align-items: center; outline: none; }
+    .mic-trigger.listening { border-color: #00f0ff; box-shadow: 0 0 25px #00f0ff; animation: pulseGlow 1s infinite alternate; }
+    .ai-logo-icon { width: 26px; height: 26px; filter: drop-shadow(0 0 6px #8a2be2); }
+    @keyframes rotateCW { 100% { transform: rotate(360deg); } }
+    @keyframes rotateCCW { 100% { transform: rotate(-360deg); } }
+    @keyframes pulseGlow { 0% { transform: scale(0.96); box-shadow: 0 0 20px #8a2be2; } 100% { transform: scale(1.04); box-shadow: 0 0 30px #8a2be2; } }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="top-left-badge">
+      <div class="badge-icon">M</div>
+      <div class="badge-text">
+        <span class="brand-title">MUKU ULTRA</span>
+        <span class="brand-sub">OS v2.30 (MIC ACTIVE)</span>
+      </div>
+    </div>
+    <div class="sci-fi-clock-box">
+      <div class="time-row">
+        <span class="hud-digital-time" id="clock">00:00</span>
+        <span class="hud-seconds" id="sec">:00</span>
+      </div>
+      <span class="sub-date" id="dayDate">DATE</span>
+    </div>
+  </div>
+  
+  <div class="top-launcher">
+    <div class="app-icon" id="phaseIndicator">PHASE: READY</div>
+    <div class="app-icon">Knowledge Graph</div>
+    <div class="app-icon">Creator Studio</div>
+  </div>
+  
+  <div class="sidebar-left">
+    <button class="nav-btn" onclick="handleNavAction('Firefox')">✦ FIREFOX</button>
+    <button class="nav-btn" onclick="handleNavAction('Explorer')">✦ EXPLORER</button>
+    <button class="nav-btn" onclick="handleNavAction('Music')">✦ MUSIC</button>
+    <button class="nav-btn" onclick="handleNavAction('Social')">✦ SOCIAL</button>
+    <button class="nav-btn" onclick="handleNavAction('Twitter')">✦ TWITTER</button>
+    <button class="nav-btn" onclick="handleNavAction('Gmail')">✦ GMAIL</button>
+  </div>
+  
+  <div class="sidebar-right">
+    <div class="widget-box">
+      <div class="widget-title">KNOWLEDGE GRAPH</div>
+      <div class="widget-val" id="graphCount">0 NODES</div>
+      <div style="font-size: 6.5px; color: #d8bfd8;">LINKED</div>
+    </div>
+    <div class="widget-box">
+      <div class="widget-title">CREATOR STUDIO</div>
+      <div class="widget-val">PHASE 29 ACTIVE</div>
+      <div>PRODUCTION READY</div>
+    </div>
+    <div class="widget-box">
+      <div class="widget-title">SYSTEM STATE</div>
+      <div class="widget-val">OPTIMIZED</div>
+      <div>SECURE</div>
+    </div>
+  </div>
+  
+  <div class="center-hud">
+    <div class="reactor-ring ring-outer-teeth"></div>
+    <div class="reactor-ring ring-segmented"></div>
+    <div class="reactor-ring ring-tech-scale"></div>
+    <div class="reactor-ring ring-inner-glow"></div>
+    <div class="core-orb">
+      <span class="core-muku">MUKU</span>
+      <span class="core-status" id="statusText">READY</span>
+    </div>
+  </div>
+  
+  <div class="bottom-hud">
+    <div class="sys-meter">
+      <span>CPU LOAD: 15%</span>
+      <div class="meter-bar"><div class="meter-fill" style="width: 15%;"></div></div>
+      <span>CORE TEMP: 34°C</span>
+      <div class="meter-bar"><div class="meter-fill" style="width: 34%;"></div></div>
+    </div>
+    <button class="mic-trigger" id="micBtn" title="Activate Voice">
+      <svg class="ai-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#FFFFFF"/>
+        <circle cx="12" cy="12" r="3" fill="#8A2BE2"/>
+      </svg>
+    </button>
+    <div class="sys-meter" style="align-items: flex-end;">
+      <span>BATTERY: 100%</span>
+      <div class="meter-bar"><div class="meter-fill" style="width: 100%;"></div></div>
+      <span>AUTHORITY: OWNER</span>
+      <div class="meter-bar"><div class="meter-fill" style="width: 100%;"></div></div>
+    </div>
+  </div>
+  
+  <script>
+    function updateClock() {
+      const now = new Date();
+      let h = String(now.getHours()).padStart(2, '0');
+      let m = String(now.getMinutes()).padStart(2, '0');
+      let s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').innerText = h + ":" + m;
+      document.getElementById('sec').innerText = ":" + s;
+      
+      const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      document.getElementById('dayDate').innerText = days[now.getDay()] + " / " + months[now.getMonth()] + " " + now.getDate();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    
+    function handleNavAction(appName) {
+      if (appName === 'Firefox') window.open('https://www.google.com', '_blank');
+      else if (appName === 'Gmail') window.open('https://mail.google.com', '_blank');
+      else if (appName === 'Twitter') window.open('https://twitter.com', '_blank');
+      else alert(appName + ' module launched.');
+    }
+
+    // Speech Recognition & Mic Setup
+    const micBtn = document.getElementById('micBtn');
+    const statusText = document.getElementById('statusText');
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+
+      micBtn.addEventListener('click', () => {
+        try {
+          recognition.start();
+        } catch(e) {
+          console.log("Recognition already active");
+        }
+      });
+
+      recognition.onstart = () => {
+        micBtn.classList.add('listening');
+        statusText.innerText = "LISTENING...";
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        statusText.innerText = transcript.toUpperCase();
+        if(transcript.toLowerCase().includes('firefox')) {
+          window.open('https://www.google.com', '_blank');
+        }
+      };
+
+      recognition.onerror = () => {
+        micBtn.classList.remove('listening');
+        statusText.innerText = "READY";
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove('listening');
+        statusText.innerText = "READY";
+      };
+    } else {
+      micBtn.addEventListener('click', () => {
+        alert("Speech Recognition is not supported on this browser.");
+      });
+    }
+  </script>
+</body>
+</html>
