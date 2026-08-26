@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MUKU ULTRA AI - OS PHASE 31</title>
+  <title>MUKU ULTRA AI - OS PHASE 32</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; user-select: none; touch-action: manipulation; }
     body {
@@ -63,7 +63,7 @@
       <div class="badge-icon">M</div>
       <div class="badge-text">
         <span class="brand-title">MUKU ULTRA</span>
-        <span class="brand-sub">OS v3.1 (DIRECT SPEECH)</span>
+        <span class="brand-sub">OS v3.2 (CLEAN DIRECT)</span>
       </div>
     </div>
     <div class="sci-fi-clock-box">
@@ -163,7 +163,7 @@
       else alert(appName + ' module launched.');
     }
 
-    // Direct Web Speech API without any modal popups
+    // Direct Speech Recognition with zero popups
     const micBtn = document.getElementById('micBtn');
     const statusText = document.getElementById('statusText');
     
@@ -193,7 +193,6 @@
         const transcript = event.results[0][0].transcript;
         statusText.innerText = transcript.toUpperCase();
         
-        // Command handling
         const query = transcript.toLowerCase();
         if(query.includes('firefox') || query.includes('google')) {
           window.open('https://www.google.com', '_blank');
@@ -209,7 +208,6 @@
       recognition.onerror = (event) => {
         micBtn.classList.remove('listening');
         statusText.innerText = "READY";
-        console.log("Speech error: ", event.error);
       };
 
       recognition.onend = () => {
@@ -221,7 +219,7 @@
     } else {
       micBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        alert("Speech engine not available.");
+        statusText.innerText = "NO SPEECH API";
       });
     }
   </script>
