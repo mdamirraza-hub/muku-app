@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MUKU ULTRA AI - OS PHASE 28-29</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; user-select: none; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; user-select: none; touch-action: manipulation; }
     body {
       background-color: #040208;
       background-image: 
@@ -13,7 +13,7 @@
         linear-gradient(rgba(138, 43, 226, 0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(138, 43, 226, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 30px 30px, 30px 30px;
-      color: #b19cd9; width: 100vw; height: 100dvh; overflow: hidden; position: relative;
+      color: #b19cd9; width: 100vw; height: 100dvh; overflow: hidden; position: fixed;
     }
     .top-header { position: absolute; top: 8px; left: 0; width: 100%; padding: 0 10px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 30; }
     .top-left-badge { display: flex; align-items: center; gap: 6px; }
@@ -48,7 +48,7 @@
     .sys-meter { display: flex; flex-direction: column; gap: 2px; font-size: 7.5px; font-weight: 700; color: #d8bfd8; }
     .meter-bar { width: 75px; height: 5px; background: rgba(138,43,226,0.15); border: 1px solid #8a2be2; border-radius: 3px; overflow: hidden; }
     .meter-fill { height: 100%; width: 85%; background: #8a2be2; box-shadow: 0 0 6px #8a2be2; }
-    .mic-trigger { width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(20, 0, 30, 0.95) 80%); border: 2px solid #d8bfd8; cursor: pointer; box-shadow: 0 0 20px rgba(138, 43, 226, 0.7), inset 0 0 12px rgba(216, 191, 216, 0.4); display: flex; justify-content: center; align-items: center; outline: none; }
+    .mic-trigger { width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(20, 0, 30, 0.95) 80%); border: 2px solid #d8bfd8; cursor: pointer; box-shadow: 0 0 20px rgba(138, 43, 226, 0.7), inset 0 0 12px rgba(216, 191, 216, 0.4); display: flex; justify-content: center; align-items: center; outline: none; -webkit-tap-highlight-color: transparent; }
     .mic-trigger.listening { border-color: #00f0ff; box-shadow: 0 0 25px #00f0ff; animation: pulseGlow 1s infinite alternate; }
     .ai-logo-icon { width: 26px; height: 26px; filter: drop-shadow(0 0 6px #8a2be2); }
     @keyframes rotateCW { 100% { transform: rotate(360deg); } }
@@ -162,21 +162,25 @@
       else alert(appName + ' module launched.');
     }
 
-    // Speech Recognition & Mic Setup
+    // Fixed Speech Recognition with touch prevention & mobile safety
     const micBtn = document.getElementById('micBtn');
     const statusText = document.getElementById('statusText');
     
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.lang = 'en-US';
+      recognition.interimResults = false;
 
-      micBtn.addEventListener('click', () => {
+      // Use both click and touchend to prevent screen shaking/bouncing on mobile
+      micBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         try {
           recognition.start();
-        } catch(e) {
-          console.log("Recognition already active");
+        } catch(err) {
+          console.log("Recognition active: ", err);
         }
       });
 
@@ -193,9 +197,10 @@
         }
       };
 
-      recognition.onerror = () => {
+      recognition.onerror = (event) => {
         micBtn.classList.remove('listening');
         statusText.innerText = "READY";
+        console.log("Speech error: ", event.error);
       };
 
       recognition.onend = () => {
@@ -203,8 +208,9 @@
         statusText.innerText = "READY";
       };
     } else {
-      micBtn.addEventListener('click', () => {
-        alert("Speech Recognition is not supported on this browser.");
+      micBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("Voice engine not supported in this shell.");
       });
     }
   </script>
