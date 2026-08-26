@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MUKU ULTRA AI - OS PHASE 28-29</title>
+  <title>MUKU ULTRA AI - OS PHASE 30</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; user-select: none; touch-action: manipulation; }
     body {
@@ -51,6 +51,16 @@
     .mic-trigger { width: 58px; height: 58px; border-radius: 50%; background: radial-gradient(circle, rgba(138, 43, 226, 0.4) 0%, rgba(20, 0, 30, 0.95) 80%); border: 2px solid #d8bfd8; cursor: pointer; box-shadow: 0 0 20px rgba(138, 43, 226, 0.7), inset 0 0 12px rgba(216, 191, 216, 0.4); display: flex; justify-content: center; align-items: center; outline: none; -webkit-tap-highlight-color: transparent; }
     .mic-trigger.listening { border-color: #00f0ff; box-shadow: 0 0 25px #00f0ff; animation: pulseGlow 1s infinite alternate; }
     .ai-logo-icon { width: 26px; height: 26px; filter: drop-shadow(0 0 6px #8a2be2); }
+    
+    /* Voice Command Modal Overlay */
+    .voice-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(4, 2, 8, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .voice-box { width: 85%; max-width: 300px; background: rgba(15, 2, 25, 0.95); border: 2px solid #8a2be2; border-radius: 15px; padding: 20px; text-align: center; box-shadow: 0 0 30px rgba(138, 43, 226, 0.6); }
+    .voice-title { font-size: 12px; font-weight: 900; color: #fff; margin-bottom: 12px; letter-spacing: 1px; text-shadow: 0 0 8px #8a2be2; }
+    .voice-input { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid #b19cd9; border-radius: 8px; padding: 10px; color: #fff; font-size: 12px; text-align: center; outline: none; margin-bottom: 12px; }
+    .voice-btn-row { display: flex; gap: 8px; justify-content: center; }
+    .v-btn { padding: 6px 14px; background: #8a2be2; color: #fff; border: none; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; }
+    .v-btn-cancel { background: #331144; }
+
     @keyframes rotateCW { 100% { transform: rotate(360deg); } }
     @keyframes rotateCCW { 100% { transform: rotate(-360deg); } }
     @keyframes pulseGlow { 0% { transform: scale(0.96); box-shadow: 0 0 20px #8a2be2; } 100% { transform: scale(1.04); box-shadow: 0 0 30px #8a2be2; } }
@@ -62,7 +72,7 @@
       <div class="badge-icon">M</div>
       <div class="badge-text">
         <span class="brand-title">MUKU ULTRA</span>
-        <span class="brand-sub">OS v2.30 (MIC ACTIVE)</span>
+        <span class="brand-sub">OS v3.0 (VOICE BRIDGE ACTIVE)</span>
       </div>
     </div>
     <div class="sci-fi-clock-box">
@@ -138,6 +148,18 @@
       <div class="meter-bar"><div class="meter-fill" style="width: 100%;"></div></div>
     </div>
   </div>
+
+  <!-- Voice Command Modal Popup -->
+  <div class="voice-modal" id="voiceModal">
+    <div class="voice-box">
+      <div class="voice-title">MUKU VOICE BRIDGE</div>
+      <input type="text" class="voice-input" id="voiceInputText" placeholder="Say or type command (e.g. firefox)...">
+      <div class="voice-btn-row">
+        <button class="v-btn" onclick="executeVoiceCommand()">EXECUTE</button>
+        <button class="v-btn v-btn-cancel" onclick="closeVoiceModal()">CANCEL</button>
+      </div>
+    </div>
+  </div>
   
   <script>
     function updateClock() {
@@ -162,56 +184,43 @@
       else alert(appName + ' module launched.');
     }
 
-    // Fixed Speech Recognition with touch prevention & mobile safety
+    // Permanent Bridge Mic Trigger for WebView
     const micBtn = document.getElementById('micBtn');
     const statusText = document.getElementById('statusText');
-    
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
+    const voiceModal = document.getElementById('voiceModal');
+    const voiceInputText = document.getElementById('voiceInputText');
 
-      // Use both click and touchend to prevent screen shaking/bouncing on mobile
-      micBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        try {
-          recognition.start();
-        } catch(err) {
-          console.log("Recognition active: ", err);
-        }
-      });
+    micBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Open Sci-Fi Voice Bridge Window instantly without loading freeze
+      voiceModal.style.display = 'flex';
+      voiceInputText.value = '';
+      voiceInputText.focus();
+      statusText.innerText = "LISTENING...";
+      micBtn.classList.add('listening');
+    });
 
-      recognition.onstart = () => {
-        micBtn.classList.add('listening');
-        statusText.innerText = "LISTENING...";
-      };
+    function closeVoiceModal() {
+      voiceModal.style.display = 'none';
+      statusText.innerText = "READY";
+      micBtn.classList.remove('listening');
+    }
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        statusText.innerText = transcript.toUpperCase();
-        if(transcript.toLowerCase().includes('firefox')) {
-          window.open('https://www.google.com', '_blank');
-        }
-      };
-
-      recognition.onerror = (event) => {
-        micBtn.classList.remove('listening');
-        statusText.innerText = "READY";
-        console.log("Speech error: ", event.error);
-      };
-
-      recognition.onend = () => {
-        micBtn.classList.remove('listening');
-        statusText.innerText = "READY";
-      };
-    } else {
-      micBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert("Voice engine not supported in this shell.");
-      });
+    function executeVoiceCommand() {
+      const query = voiceInputText.value.trim().toLowerCase();
+      closeVoiceModal();
+      if(!query) return;
+      
+      statusText.innerText = query.toUpperCase();
+      if(query.includes('firefox') || query.includes('google')) {
+        window.open('https://www.google.com', '_blank');
+      } else if(query.includes('gmail') || query.includes('mail')) {
+        window.open('https://mail.google.com', '_blank');
+      } else if(query.includes('twitter')) {
+        window.open('https://twitter.com', '_blank');
+      } else {
+        alert("Command executed: " + query);
+      }
     }
   </script>
 </body>
